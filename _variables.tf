@@ -17,7 +17,19 @@ variable "org_enabled_policy_types" {
 variable "org_service_access_principals" {
   type = list(string)
   default = [
+    "account.amazonaws.com",
     "cloudtrail.amazonaws.com",
+    "config.amazonaws.com",
+  ]
+  description = <<DOC
+  Refer to: https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services_list.html
+  DOC
+}
+
+variable "delegated_admin_principals" {
+  type = list(string)
+  default = [
+    "account.amazonaws.com",
     "config.amazonaws.com",
   ]
 }
@@ -42,7 +54,7 @@ variable "allow_iam_user_access_to_billing" {
   default = true
 }
 
-variable "role_name" {
+variable "access_role_name" {
   type    = string
   default = "OrganizationAccountAccessRole"
 }
