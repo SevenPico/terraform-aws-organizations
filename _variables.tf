@@ -1,4 +1,4 @@
-variable "email_address" {
+variable "email_base_address" {
   type = string
 }
 

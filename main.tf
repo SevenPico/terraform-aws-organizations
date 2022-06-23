@@ -50,7 +50,7 @@ resource "aws_organizations_account" "parent" {
   for_each = module.this.enabled ? var.accounts : {}
 
   name                       = each.value.parent
-  email                      = replace(var.email_address, "@", "+${each.key}+${each.value.parent}@")
+  email                      = replace(var.email_base_address, "@", "+${each.key}+${each.value.parent}@")
   close_on_deletion          = var.account_close_on_deletion && !var.enable_govcloud
   create_govcloud            = var.enable_govcloud
   iam_user_access_to_billing = var.allow_iam_user_access_to_billing ? "ALLOW" : "DENY"
@@ -74,7 +74,7 @@ resource "aws_organizations_account" "child" {
   for_each = module.this.enabled ? local.org_unit_child_map : {}
 
   name                       = each.value.child
-  email                      = replace(var.email_address, "@", "+${each.value.org_unit}+${each.value.child}@")
+  email                      = replace(var.email_base_address, "@", "+${each.value.org_unit}+${each.value.child}@")
   close_on_deletion          = var.account_close_on_deletion && !var.enable_govcloud
   create_govcloud            = var.enable_govcloud
   iam_user_access_to_billing = var.allow_iam_user_access_to_billing ? "ALLOW" : "DENY"

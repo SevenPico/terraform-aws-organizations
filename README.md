@@ -14,3 +14,14 @@ terraform import 'aws_organizations_organizational_unit.this["example"]' ou-abc-
 terraform import 'aws_organizations_account.parent["example"]' 123456789
 terraform import 'aws_organizations_account.child["example-dev"]' 987654321
 ```
+
+## TODO
+- support multiple parent accounts
+```
+  accounts = {
+    example = {
+      parent   = ["admin", "security"]
+      children = ["dev", "qa", "prod"]
+    }
+  }
+```
