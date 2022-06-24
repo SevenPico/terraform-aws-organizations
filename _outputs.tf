@@ -49,8 +49,8 @@ output "profiles" {
     for name, id in local.accounts_flat:
 <<FMT
 [profile ${name}]
-source_profile = ${var.source_profile}
-role_arn       = arn:aws:iam:${id}:role/${access_role_name}
+source_profile = ${var.profile}
+role_arn       = arn:aws:iam:${id}:role/${var.access_role_name}
 color          = ${substr(sha1(id), 0, 6)}
 FMT
   ])

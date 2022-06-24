@@ -58,3 +58,7 @@ variable "access_role_name" {
   type    = string
   default = "OrganizationAccountAccessRole"
 }
+
+variable "profile" {
+  type = string
+}
