@@ -44,6 +44,18 @@ output "swtichrole_urls" {
   ]
 }
 
+output "profiles" {
+  value = join("\n", [
+    for name, id in local.accounts_flat:
+<<FMT
+[profile ${name}]
+source_profile = ${var.source_profile}
+role_arn       = arn:aws:iam:${id}:role/${access_role_name}
+color          = ${substr(sha1(id), 0, 6)}
+FMT
+  ])
+}
+
 output "access_role_name" {
   value = var.access_role_name
 }
