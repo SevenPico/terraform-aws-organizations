@@ -50,7 +50,7 @@ output "profiles" {
 <<FMT
 [profile ${name}]
 source_profile = ${var.profile}
-role_arn       = arn:aws:iam:${id}:role/${var.access_role_name}
+role_arn       = arn:aws::iam:${id}:role/${var.access_role_name}
 color          = ${substr(sha1(id), 0, 6)}
 FMT
   ])
