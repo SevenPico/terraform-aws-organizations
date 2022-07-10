@@ -34,7 +34,7 @@ output "accounts" {
 }
 
 output "accounts_flat" {
-  value = local.accounts
+  value = local.accounts_flat
 }
 
 output "swtichrole_urls" {
