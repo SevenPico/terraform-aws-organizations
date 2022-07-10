@@ -1,30 +1,62 @@
 locals {
+  parent_profile_name = one([for project, level in var.account_hierarchy : level.parent.profile])
+
   accounts = {
-    for k, v in var.accounts :
-      k => {
+    for project, level in var.account_hierarchy :
+      project => {
         parent = {
-          name = aws_organizations_account.parent[k].name
-          id = aws_organizations_account.parent[k].id
+          alias   = var.account_hierarchy[project].parent.alias != null ? var.account_hierarchy[project].parent.alias : "${project}-${replace(aws_organizations_account.parent[project].name, ".", "-")}"
+          id      = aws_organizations_account.parent[project].id
+          email   = aws_organizations_account.parent[project].email
+          name    = aws_organizations_account.parent[project].name
+          profile = var.account_hierarchy[project].parent.profile != null ? var.account_hierarchy[project].parent.profile : "${project}-${replace(aws_organizations_account.parent[project].name, ".", "-")}"
         }
         children = [
-          for c in v.children: {
-            name = aws_organizations_account.child["${k}-${c}"].name
-            id = aws_organizations_account.child["${k}-${c}"].id
+          for child in level.children: {
+            alias   = child.alias
+            email   = aws_organizations_account.child["${project}-${child.alias}"].email
+            id      = aws_organizations_account.child["${project}-${child.alias}"].id
+            name    = aws_organizations_account.child["${project}-${child.alias}"].name
+            profile = child.profile
           }
         ]
       }
   }
 
-  accounts_flat = merge(
+  account_names_flat = merge(
     {
-      for k, v in local.accounts:
-        "${k}-${v.parent.name}" => v.parent.id
+      for project, level in local.accounts:
+        "${level.parent.name}" => level.parent.id
     },
     [
-      for k, v in local.accounts: {
-        for c in v.children:
-          "${k}-${c.name}" => c.id
+      for project, level in local.accounts: {
+        for child in level.children:
+          "${child.name}" => child.id
       }
+    ]...)
+
+  account_profiles_flat = merge(
+    {
+      for project, level in local.accounts:
+        "${level.parent.profile}" => level.parent.id
+    },
+    [
+      for project, level in local.accounts: {
+        for child in level.children:
+          "${child.profile}" => child.id
+      }
+    ]...)
+
+  account_aliases_flat = merge(
+    {
+     for project, level in local.accounts:
+      "${level.parent.alias}" => level.parent.id
+    },
+    [
+     for project, level in local.accounts: {
+      for child in level.children:
+       "${child.alias}" => child.id
+    }
     ]...)
 }
 
@@ -33,23 +65,31 @@ output "accounts" {
   value = local.accounts
 }
 
-output "accounts_flat" {
-  value = local.accounts_flat
+output "account_names_flat" {
+  value = local.account_names_flat
+}
+
+output "account_profiles_flat" {
+  value = local.account_profiles_flat
+}
+
+output "account_aliases_flat" {
+  value = local.account_aliases_flat
 }
 
 output "swtichrole_urls" {
   value = [
-    for name, id in local.accounts_flat:
+    for name, id in local.account_names_flat:
       "https://signin.aws.amazon.com/switchrole?account=${id}&roleName=${var.access_role_name}&displayName=${name}"
   ]
 }
 
-output "profiles" {
+output "aws_config_profiles" {
   value = join("\n", [
-    for name, id in local.accounts_flat:
+    for profile, id in local.account_profiles_flat:
 <<FMT
-[profile ${name}]
-source_profile = ${var.profile}
+[profile ${profile}]
+source_profile = ${local.parent_profile_name}
 role_arn       = arn:aws::iam:${id}:role/${var.access_role_name}
 color          = ${substr(sha1(id), 0, 6)}
 FMT

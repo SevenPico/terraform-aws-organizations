@@ -1,11 +1,19 @@
-variable "email_base_address" {
-  type = string
-}
-
-variable "accounts" {
+variable "account_hierarchy" {
   type = map(object({
-    parent   = string
-    children = list(string)
+    parent   = object({
+      alias = string
+      id = number
+      name = string
+      profile = string
+      email = string
+    })
+    children = list(object({
+      alias = string
+      id = number
+      name = string
+      profile = string
+      email = string
+    }))
   }))
 }
 
@@ -57,8 +65,4 @@ variable "allow_iam_user_access_to_billing" {
 variable "access_role_name" {
   type    = string
   default = "OrganizationAccountAccessRole"
-}
-
-variable "profile" {
-  type = string
 }

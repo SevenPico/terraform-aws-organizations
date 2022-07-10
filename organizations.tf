@@ -1,6 +1,6 @@
 locals {
   admin_service_principal_map = {
-    for t in setproduct(keys(var.accounts), var.delegated_admin_principals) :
+    for t in setproduct(keys(var.account_hierarchy), var.delegated_admin_principals) :
     "${t[0]}-${t[1]}" => {
       account_id        = try(aws_organizations_account.parent[t[0]].id, "")
       service_principal = try(t[1], "")
@@ -8,11 +8,11 @@ locals {
   }
 
   org_unit_child_map = merge([
-    for k, v in var.accounts : {
-      for c in v.children :
-      "${k}-${c}" => {
-        org_unit = k
-        child = c
+    for project, level in var.account_hierarchy : {
+      for child in level.children :
+      "${project}-${child.alias}" => {
+        org_unit = project
+        child = child
       }
     }
   ]...)
@@ -35,7 +35,7 @@ resource "aws_organizations_organization" "this" {
 # Organizational Unit
 # ------------------------------------------------------------------------------
 resource "aws_organizations_organizational_unit" "this" {
-  for_each = module.this.enabled ? var.accounts : {}
+  for_each = module.this.enabled ? var.account_hierarchy : {}
 
   name      = each.key
   parent_id = one(aws_organizations_organization.this[*].roots[0].id)
@@ -47,10 +47,10 @@ resource "aws_organizations_organizational_unit" "this" {
 # Parent Account
 # ------------------------------------------------------------------------------
 resource "aws_organizations_account" "parent" {
-  for_each = module.this.enabled ? var.accounts : {}
+  for_each = module.this.enabled ? var.account_hierarchy : {}
 
-  name                       = each.value.parent
-  email                      = replace(var.email_base_address, "@", "+${each.key}+${each.value.parent}@")
+  name                       = each.value.parent.name
+  email                      = each.value.parent.email
   close_on_deletion          = var.account_close_on_deletion && !var.enable_govcloud
   create_govcloud            = var.enable_govcloud
   iam_user_access_to_billing = var.allow_iam_user_access_to_billing ? "ALLOW" : "DENY"
@@ -82,12 +82,21 @@ resource "aws_organizations_delegated_administrator" "parent" {
 resource "aws_organizations_account" "child" {
   for_each = module.this.enabled ? local.org_unit_child_map : {}
 
-  name                       = each.value.child
-  email                      = replace(var.email_base_address, "@", "+${each.value.org_unit}+${each.value.child}@")
+  name                       = each.value.child.name
+  email                      = each.value.child.email
   close_on_deletion          = var.account_close_on_deletion && !var.enable_govcloud
   create_govcloud            = var.enable_govcloud
   iam_user_access_to_billing = var.allow_iam_user_access_to_billing ? "ALLOW" : "DENY"
   parent_id                  = aws_organizations_organizational_unit.this[each.value.org_unit].id
   role_name                  = var.access_role_name
   tags                       = module.this.tags
+
+  lifecycle {
+    ignore_changes = [
+      email,
+      iam_user_access_to_billing,
+      name,
+      role_name
+    ]
+  }
 }
