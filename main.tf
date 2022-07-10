@@ -57,6 +57,15 @@ resource "aws_organizations_account" "parent" {
   parent_id                  = aws_organizations_organizational_unit.this[each.key].id
   role_name                  = var.access_role_name
   tags                       = module.this.tags
+
+  lifecycle {
+    ignore_changes = [
+      email,
+      iam_user_access_to_billing,
+      name,
+      role_name
+    ]
+  }
 }
 
 resource "aws_organizations_delegated_administrator" "parent" {
