@@ -3,12 +3,12 @@ locals {
     for k, v in var.accounts :
       k => {
         parent = {
-          name = v.parent
+          name = aws_organizations_account.parent[k].name
           id = aws_organizations_account.parent[k].id
         }
         children = [
           for c in v.children: {
-            name = c
+            name = aws_organizations_account.child["${k}-${c}"].name
             id = aws_organizations_account.child["${k}-${c}"].id
           }
         ]
