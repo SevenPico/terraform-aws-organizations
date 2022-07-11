@@ -80,7 +80,7 @@ output "account_aliases_flat" {
 output "swtichrole_urls" {
   value = [
     for name, id in local.account_names_flat:
-      "https://signin.aws.amazon.com/switchrole?account=${id}&roleName=${var.access_role_name}&displayName=${name}"
+      "https://signin.aws.amazon.com/switchrole?account=${id}&roleName=${var.access_role_name}&displayName=${urlencode(name)}"
   ]
 }
 
