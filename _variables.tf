@@ -17,6 +17,7 @@ variable "account_hierarchy" {
   }))
 }
 
+
 variable "org_enabled_policy_types" {
   type    = list(string)
   default = []

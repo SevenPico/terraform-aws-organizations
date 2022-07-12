@@ -1,6 +1,4 @@
 locals {
-  parent_profile_name = one([for project, level in var.account_hierarchy : level.parent.profile])
-
   accounts = {
     for project, level in var.account_hierarchy :
       project => {
@@ -22,6 +20,9 @@ locals {
         ]
       }
   }
+
+  parent_profile_name = one([for project, level in local.accounts : level.parent.profile])
+  parent_account      = one([for project, level in local.accounts : level.parent])
 
   account_names_flat = merge(
     {
@@ -63,6 +64,10 @@ locals {
 
 output "accounts" {
   value = local.accounts
+}
+
+output "parent_account" {
+  value = local.parent_account
 }
 
 output "account_names_flat" {
