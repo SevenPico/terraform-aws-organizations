@@ -11,11 +11,11 @@ locals {
         }
         children = [
           for child in level.children: {
-            id      = aws_organizations_account.child["${unit}-${child.alias}"].id
-            name    = aws_organizations_account.child["${unit}-${child.alias}"].name
-            email   = aws_organizations_account.child["${unit}-${child.alias}"].email
-            alias   = child.alias != null || child.alias != "" ? child.alias : "${unit}-${replace(aws_organizations_account.child["${unit}-${child.alias}"].name, ".", "-")}"
-            profile = child.profile != null || child.profile != "" ? child.profile : "${unit}-${replace(aws_organizations_account.child["${unit}-${child.alias}"].name, ".", "-")}"
+            id      = aws_organizations_account.child[child.name].id
+            name    = aws_organizations_account.child[child.name].name
+            email   = aws_organizations_account.child[child.name].email
+            alias   = child.alias != null || child.alias != "" ? child.alias : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
+            profile = child.profile != null || child.profile != "" ? child.profile : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
           }
         ]
       }
@@ -108,4 +108,8 @@ FMT
 
 output "access_role_name" {
   value = var.access_role_name
+}
+
+output "context" {
+  value = module.this.context
 }
