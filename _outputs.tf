@@ -34,7 +34,7 @@ locals {
 
   parent_profile_name = one([for unit, level in local.accounts : level.parent.profile])
   parent_account      = one([for unit, level in local.accounts : level.parent])
-  child_accounts      = one([for unit, level in local.accounts : level.parent])
+  child_accounts      = one([for unit, level in local.accounts : level.children])
 
   account_names_flat = merge(
     {
@@ -122,5 +122,5 @@ output "access_role_name" {
 }
 
 output "context" {
-  value = module.this.context
+  value = module.meta.context
 }
