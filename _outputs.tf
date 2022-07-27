@@ -122,5 +122,5 @@ output "access_role_name" {
 }
 
 output "context" {
-  value = module.this.context
+  value = module.meta.context
 }
