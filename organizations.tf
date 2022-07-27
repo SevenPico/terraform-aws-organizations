@@ -91,12 +91,12 @@ resource "aws_organizations_account" "child" {
   role_name                  = var.access_role_name
   tags                       = module.this.tags
 
-#  lifecycle {
-##    ignore_changes = [
-##      email,
-##      iam_user_access_to_billing,
-##      name,
-##      role_name
-##    ]
-#  }
+  lifecycle {
+    ignore_changes = [
+      email,
+      iam_user_access_to_billing,
+      name,
+      role_name
+    ]
+  }
 }
