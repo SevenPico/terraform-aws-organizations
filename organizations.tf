@@ -8,12 +8,12 @@ locals {
   }
 
   org_unit_child_map = merge([
-    for project, level in var.account_hierarchy : {
+    for org_unit, level in var.account_hierarchy : {
       for child in level.children :
-      "${project}-${child.alias}" => {
-        org_unit = project
-        child = child
-      }
+        "${child.name}" => {
+          org_unit = org_unit
+          child = child
+        }
     }
   ]...)
 }

@@ -1,18 +1,18 @@
 variable "account_hierarchy" {
-  type = map(object({
-    parent   = object({
-      alias = string
-      id = number
-      name = string
+  type = map(object({   # Each Top Level Key represents an Org Unit
+    parent = object({
+      name    = string
+      email   = string
+      alias   = string
       profile = string
-      email = string
+      id      = string   # FIXME: If this is not null, the account should be referenced via a data resource
     })
     children = list(object({
-      alias = string
-      id = number
-      name = string
+      name    = string
+      email   = string
+      alias   = string
       profile = string
-      email = string
+      id      = string    # FIXME: If this is not null, the account should be referenced via a data resource
     }))
   }))
 }
