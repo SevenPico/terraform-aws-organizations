@@ -36,39 +36,41 @@ locals {
   parent_account      = one([for unit, level in local.accounts : level.parent])
   child_accounts      = one([for unit, level in local.accounts : level.children])
 
+  account_ids = values(local.account_names_flat)
+
   account_names_flat = merge(
     {
       for unit, level in local.accounts:
-        "${level.parent.name}" => "${level.parent.id}"
+        "${level.parent.name}" => tostring(level.parent.id)
     },
     [
       for unit, level in local.accounts: {
         for child in level.children:
-          "${child.name}" => "${child.id}"
+          "${child.name}" => tostring(child.id)
       }
     ]...)
 
   account_profiles_flat = merge(
     {
       for unit, level in local.accounts:
-        "${level.parent.profile}" => "${level.parent.id}"
+        "${level.parent.profile}" => tostring(level.parent.id)
     },
     [
       for unit, level in local.accounts: {
         for child in level.children:
-          "${child.profile}" => "${child.id}"
+          "${child.profile}" => tostring(child.id)
       }
     ]...)
 
   account_aliases_flat = merge(
     {
      for unit, level in local.accounts:
-      "${level.parent.alias}" => "${level.parent.id}"
+      "${level.parent.alias}" => tostring(level.parent.id)
     },
     [
      for unit, level in local.accounts: {
       for child in level.children:
-       "${child.alias}" => "${child.id}"
+       "${child.alias}" => tostring(child.id)
     }
     ]...)
 }
