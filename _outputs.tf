@@ -36,17 +36,17 @@ locals {
       }
     ]...)
 
-  account_profiles_flat = merge(
-    {
-      for project, level in local.accounts:
-        "${level.parent.profile}" => level.parent.id
-    },
-    [
-      for project, level in local.accounts: {
-        for child in level.children:
-          "${child.profile}" => child.id
-      }
-    ]...)
+#  account_profiles_flat = merge(
+#    {
+#      for project, level in local.accounts:
+#        "${level.parent.profile}" => level.parent.id
+#    },
+#    [
+#      for project, level in local.accounts: {
+#        for child in level.children:
+#          "${child.profile}" => child.id
+#      }
+#    ]...)
 
   account_aliases_flat = merge(
     {
