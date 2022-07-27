@@ -2,10 +2,10 @@ locals {
   temp_children_map = one([
     for unit, level in var.account_hierarchy :
        {
-          for child in var.account_hierarchy[unit].children :
-            child.name => {
-               alias   = child.alias
-               profile = child.profile
+          for c in var.account_hierarchy[unit].children :
+            c.name => {
+               alias   = c.alias
+               profile = c.profile
             }
        }
   ])
