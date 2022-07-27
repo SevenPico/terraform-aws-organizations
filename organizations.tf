@@ -23,7 +23,7 @@ locals {
 # Organization
 # ------------------------------------------------------------------------------
 resource "aws_organizations_organization" "meta" {
-  count = module.meta.enabled ? 1 : 0
+  count = module.this.enabled ? 1 : 0
 
   feature_set                   = var.org_feature_set
   aws_service_access_principals = var.org_service_access_principals
@@ -35,11 +35,11 @@ resource "aws_organizations_organization" "meta" {
 # Organizational Unit
 # ------------------------------------------------------------------------------
 resource "aws_organizations_organizational_unit" "meta" {
-  for_each = module.meta.enabled ? var.account_hierarchy : {}
+  for_each = module.this.enabled ? var.account_hierarchy : {}
 
   name      = each.key
   parent_id = one(aws_organizations_organization.meta[*].roots[0].id)
-  tags      = module.meta.tags
+  tags      = module.this.tags
 }
 
 
@@ -47,7 +47,7 @@ resource "aws_organizations_organizational_unit" "meta" {
 # Parent Account
 # ------------------------------------------------------------------------------
 resource "aws_organizations_account" "parent" {
-  for_each = module.meta.enabled ? var.account_hierarchy : {}
+  for_each = module.this.enabled ? var.account_hierarchy : {}
 
   name                       = each.value.parent.name
   email                      = each.value.parent.email
@@ -56,7 +56,7 @@ resource "aws_organizations_account" "parent" {
   iam_user_access_to_billing = var.allow_iam_user_access_to_billing ? "ALLOW" : "DENY"
   parent_id                  = aws_organizations_organizational_unit.meta[each.key].id
   role_name                  = var.access_role_name
-  tags                       = module.meta.tags
+  tags                       = module.this.tags
 
   lifecycle {
     ignore_changes = [
@@ -69,7 +69,7 @@ resource "aws_organizations_account" "parent" {
 }
 
 resource "aws_organizations_delegated_administrator" "parent" {
-  for_each = module.meta.enabled ? local.admin_service_principal_map : {}
+  for_each = module.this.enabled ? local.admin_service_principal_map : {}
 
   account_id        = each.value.account_id
   service_principal = each.value.service_principal
@@ -80,7 +80,7 @@ resource "aws_organizations_delegated_administrator" "parent" {
 # Children Accounts
 # ------------------------------------------------------------------------------
 resource "aws_organizations_account" "child" {
-  for_each = module.meta.enabled ? local.org_unit_child_map : {}
+  for_each = module.this.enabled ? local.org_unit_child_map : {}
 
   name                       = each.value.child.name
   email                      = each.value.child.email
@@ -89,7 +89,7 @@ resource "aws_organizations_account" "child" {
   iam_user_access_to_billing = var.allow_iam_user_access_to_billing ? "ALLOW" : "DENY"
   parent_id                  = aws_organizations_organizational_unit.meta[each.value.org_unit].id
   role_name                  = var.access_role_name
-  tags                       = module.meta.tags
+  tags                       = module.this.tags
 
   lifecycle {
     ignore_changes = [
