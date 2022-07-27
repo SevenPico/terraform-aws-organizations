@@ -80,6 +80,10 @@ output "accounts" {
   value = local.accounts
 }
 
+output "account_ids" {
+  value = local.account_ids
+}
+
 output "parent_account" {
   value = local.parent_account
 }
