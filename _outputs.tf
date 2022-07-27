@@ -74,9 +74,9 @@ output "account_names_flat" {
   value = local.account_names_flat
 }
 
-output "account_profiles_flat" {
-  value = local.account_profiles_flat
-}
+#output "account_profiles_flat" {
+#  value = local.account_profiles_flat
+#}
 
 output "account_aliases_flat" {
   value = local.account_aliases_flat
@@ -89,17 +89,17 @@ output "swtichrole_urls" {
   ]
 }
 
-output "aws_config_profiles" {
-  value = join("\n", [
-    for profile, id in local.account_profiles_flat:
-<<FMT
-[profile ${profile}]
-source_profile = ${local.parent_profile_name}
-role_arn       = arn:aws::iam:${id}:role/${var.access_role_name}
-color          = ${substr(sha1(id), 0, 6)}
-FMT
-  ])
-}
+#output "aws_config_profiles" {
+#  value = join("\n", [
+#    for profile, id in local.account_profiles_flat:
+#<<FMT
+#[profile ${profile}]
+#source_profile = ${local.parent_profile_name}
+#role_arn       = arn:aws::iam:${id}:role/${var.access_role_name}
+#color          = ${substr(sha1(id), 0, 6)}
+#FMT
+#  ])
+#}
 
 output "access_role_name" {
   value = var.access_role_name
