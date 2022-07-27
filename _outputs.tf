@@ -1,4 +1,10 @@
 locals {
+  temp_children_map = one([
+    for unit, level in var.account_hierarchy :
+       { for child in var.account_hierarchy[unit].children :
+          child.name => child }
+  ])
+
   accounts = {
     for unit, level in var.account_hierarchy :
       unit => {
@@ -14,8 +20,8 @@ locals {
             id      = aws_organizations_account.child[child.name].id
             name    = aws_organizations_account.child[child.name].name
             email   = aws_organizations_account.child[child.name].email
-            alias   = child.alias != null || child.alias != "" ? child.alias : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
-            profile = child.profile != null || child.profile != "" ? child.profile : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
+            alias   = local.temp_children_map[child.name].alias != null ? local.temp_children_map[child.name].alias : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
+            profile = local.temp_children_map[child.name].profile != null ? local.temp_children_map[child.name].profile : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
           }
         ]
       }
