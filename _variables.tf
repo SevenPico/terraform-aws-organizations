@@ -50,7 +50,7 @@ variable "org_feature_set" {
 
 variable "account_close_on_deletion" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "enable_govcloud" {
