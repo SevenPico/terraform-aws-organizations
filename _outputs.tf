@@ -127,6 +127,3 @@ output "access_role_name" {
   value = var.access_role_name
 }
 
-output "context" {
-  value = module.meta.context
-}
