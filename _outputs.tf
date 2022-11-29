@@ -4,8 +4,10 @@ locals {
        {
           for c in var.account_hierarchy[unit].children :
             c.name => {
-               alias   = c.alias
-               profile = c.profile
+               alias              = c.alias
+               profile            = c.profile
+               allowed_regions    = c.allowed_regions
+               allowed_principals = c.allowed_principals
             }
        }
   ])
