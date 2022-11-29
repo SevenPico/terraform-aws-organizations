@@ -14,19 +14,23 @@ locals {
     for unit, level in var.account_hierarchy :
       unit => {
         parent = {
-          id      = "${aws_organizations_account.parent[unit].id}"
-          name    = aws_organizations_account.parent[unit].name
-          email   = aws_organizations_account.parent[unit].email
-          alias   = var.account_hierarchy[unit].parent.alias != null ? var.account_hierarchy[unit].parent.alias : "${unit}-${replace(aws_organizations_account.parent[unit].name, ".", "-")}"
-          profile = var.account_hierarchy[unit].parent.profile != null ? var.account_hierarchy[unit].parent.profile : "${unit}-${replace(aws_organizations_account.parent[unit].name, ".", "-")}"
+          id                 = "${aws_organizations_account.parent[unit].id}"
+          name               = aws_organizations_account.parent[unit].name
+          email              = aws_organizations_account.parent[unit].email
+          alias              = var.account_hierarchy[unit].parent.alias != null ? var.account_hierarchy[unit].parent.alias : "${unit}-${replace(aws_organizations_account.parent[unit].name, ".", "-")}"
+          profile            = var.account_hierarchy[unit].parent.profile != null ? var.account_hierarchy[unit].parent.profile : "${unit}-${replace(aws_organizations_account.parent[unit].name, ".", "-")}"
+          allowed_regions    = var.account_hierarchy[unit].parent.allowed_regions
+          allowed_principals = var.account_hierarchy[unit].parent.allowed_principals
         }
         children = [
           for child in level.children: {
-            id      = "${aws_organizations_account.child[child.name].id}"
-            name    = aws_organizations_account.child[child.name].name
-            email   = aws_organizations_account.child[child.name].email
-            alias   = local.temp_children_map[child.name].alias != null ? local.temp_children_map[child.name].alias : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
-            profile = local.temp_children_map[child.name].profile != null ? local.temp_children_map[child.name].profile : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
+            id                 = "${aws_organizations_account.child[child.name].id}"
+            name               = aws_organizations_account.child[child.name].name
+            email              = aws_organizations_account.child[child.name].email
+            alias              = local.temp_children_map[child.name].alias != null ? local.temp_children_map[child.name].alias : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
+            profile            = local.temp_children_map[child.name].profile != null ? local.temp_children_map[child.name].profile : "${unit}-${replace(aws_organizations_account.child[child.name].name, ".", "-")}"
+            allowed_regions    = local.temp_children_map[child.name].allowed_regions
+            allowed_principals = local.temp_children_map[child.name].allowed_principals
           }
         ]
       }
